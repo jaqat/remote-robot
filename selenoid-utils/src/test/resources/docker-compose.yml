@@ -1,0 +1,49 @@
+version: '2'
+services:
+
+  ggr:
+    container_name: ggr
+    image: "aerokube/ggr:latest-release"
+    volumes:
+      - "./ggr:/etc/grid-router"
+    ports:
+      - "4000:4444"
+    networks:
+      test-net:
+
+  selenoid:
+    container_name: selenoid
+    image: "selenoid:ports"
+    command: ["-timeout", "1m", "-limit", "8", "-container-network", "resources_test-net"]
+    ports:
+      - "4001:4444"
+    volumes:
+      - "./selenoid/config:/etc/selenoid/"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      test-net:
+
+  selenoid-ui:
+    image: "aerokube/selenoid-ui"
+    links:
+      - selenoid
+      - test-site
+    ports:
+      - "7000:8080"
+    command: ["--selenoid-uri", "http://selenoid:4444"]
+    networks:
+      test-net:
+
+  test-site:
+    image : httpd:2.4
+    container_name: test-site
+    volumes:
+      - ./pages:/usr/local/apache2/htdocs/
+    ports:
+      - "8000:80"
+    networks:
+      test-net:
+
+networks:
+  test-net:
+    driver: bridge

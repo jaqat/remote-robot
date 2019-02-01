@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            background-color: darksalmon;
+        }
+
+        .centered {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+        }
+
+        div {
+            background-color: dodgerblue;
+            width: 500px;
+            height: 500px
+        }
+
+        button {
+            background-color: lightsteelblue;
+            width: 100px;
+            height: 100px
+        }
+    </style>
+</head>
+<body>
+<input id="text_input" type="text" width="200px">
+<div class="centered"/>
+<button class="centered" onclick="location.href='test_redirected_page.html';"> </button>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<qa:browsers xmlns:qa="urn:config.gridrouter.qatools.ru">
+
+    <browser name="firefox" defaultVersion="64">
+        <version number="64">
+            <region name="1">
+                <host name="docker.for.mac.localhost" port="4001" count="1"/>
+            </region>
+        </version>
+    </browser>
+
+   <browser name="chrome" defaultVersion="70">
+       <version number="70">
+           <region name="1">
+               <host count="5" name="docker.for.mac.localhost" port="4001"/>
+           </region>
+       </version>
+   </browser>
+
+</qa:browsers>
