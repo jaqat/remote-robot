@@ -1,22 +1,29 @@
 package com.github.jaqat.remoterobot.client;
 
-import com.github.jaqat.remoterobot.commons.utils.Base64;
 import com.github.jaqat.remoterobot.commons.protocol.Request;
 import com.github.jaqat.remoterobot.commons.protocol.Response;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.Base64;
 
 import static com.github.jaqat.remoterobot.commons.protocol.Operation.*;
 
 public class RemoteRobot {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Client.class);
+    private static Logger LOGGER = LoggerFactory.getLogger("RemoteRobot");
+
+    private static int MAX_TRANSFER_SIZE = 10485760;
 
     private int port;
     private String host;
@@ -33,7 +40,7 @@ public class RemoteRobot {
      * @return success flag
      */
     public boolean pressKey(int keyCode) {
-        return sendCommandMessage(
+        return sendRequest(
                 new Request(KEY_PRESS, keyCode)
         ).isSuccess();
     }
@@ -46,7 +53,7 @@ public class RemoteRobot {
      * @return {@link Color}
      */
     public Color getPixelColor(int x, int y) {
-        Response response = sendCommandMessage(
+        Response response = sendRequest(
                 new Request(GET_PIXEL_COLOR, x, y)
         );
         return response.getResultObject() == null ? null : (Color) response.getResultObject();
@@ -59,10 +66,9 @@ public class RemoteRobot {
      */
     public byte[] captureScreen() {
         try {
-            Response response = sendCommandMessage(new Request(CAPTURE_SCREEN));
+            Response response = sendRequest(new Request(CAPTURE_SCREEN));
             if (response.isSuccess() && response.getResultObject() != null) {
-                Base64 base64 = new Base64();
-                return Base64.decode(response.getResultObject().toString());
+                return Base64.getDecoder().decode(response.getResultObject().toString());
             }
         } catch (Exception e) {
             LOGGER.error("Error while capturing remote screen : " + e.getMessage());
@@ -77,14 +83,10 @@ public class RemoteRobot {
      * @return success flag
      */
     public boolean captureScreen(String fileNameSaveTo) {
-        try {
-            Response response = sendCommandMessage(new Request(CAPTURE_SCREEN));
-            if (response.isSuccess() && response.getResultObject() != null) {
-                saveByteArrayToFile(fileNameSaveTo, Base64.decode(response.getResultObject().toString()));
-                return true;
-            }
-        } catch (IOException e) {
-            LOGGER.error("Error while saving captured remote screen to local file : " + e.getMessage());
+        Response response = sendRequest(new Request(CAPTURE_SCREEN));
+        if (response.isSuccess() && response.getResultObject() != null) {
+            saveByteArrayToFile(fileNameSaveTo, Base64.getDecoder().decode(response.getResultObject().toString()));
+            return true;
         }
         return false;
     }
@@ -96,10 +98,9 @@ public class RemoteRobot {
      */
     public byte[] captureScreen(int x0, int y0, int x1, int y1) {
         try {
-            Response response = sendCommandMessage(new Request(CAPTURE_SCREEN, x0, y0, x1, y1));
+            Response response = sendRequest(new Request(CAPTURE_SCREEN, x0, y0, x1, y1));
             if (response.isSuccess() && response.getResultObject() != null) {
-                Base64 base64 = new Base64();
-                return Base64.decode(response.getResultObject().toString());
+                return Base64.getDecoder().decode(response.getResultObject().toString());
             }
         } catch (Exception e) {
             LOGGER.error("Error while capturing remote screen : " + e.getMessage());
@@ -108,25 +109,21 @@ public class RemoteRobot {
     }
 
     /**
-     * Capture remote screen partially with saving to required file
-     *
-     * @param fileNameSaveTo
-     * @return success flag
-     */
-    /**
      * Partially capture remote screen with saving to required file
+     *
      * @param fileNameSaveTo - absolute path of target file with screenshot
-     * @param x - horizontal coordinate (pixels)
-     * @param y - vertical coordinate (pixels)
-     * @param width (pixels)
-     * @param height (pixels)
+     * @param x              - horizontal coordinate (pixels)
+     * @param y              - vertical coordinate (pixels)
+     * @param width          (pixels)
+     * @param height         (pixels)
      * @return success flag
      */
+
     public boolean captureScreen(String fileNameSaveTo, int x, int y, int width, int height) {
         try {
-            Response response = sendCommandMessage(new Request(CAPTURE_SCREEN, x, y, width, height));
+            Response response = sendRequest(new Request(CAPTURE_SCREEN, x, y, width, height));
             if (response.isSuccess() && response.getResultObject() != null) {
-                saveByteArrayToFile(fileNameSaveTo, Base64.decode(response.getResultObject().toString()));
+                saveByteArrayToFile(fileNameSaveTo, Base64.getDecoder().decode(response.getResultObject().toString()));
                 return true;
             }
         } catch (Exception e) {
@@ -149,22 +146,58 @@ public class RemoteRobot {
     /**
      * Mouse click at remote server
      *
-     * @param x - horizontal coordinate
-     * @param y - vertica coordinate
+     * @param x          - horizontal coordinate
+     * @param y          - vertica coordinate
      * @param buttonMask {@link java.awt.event.InputEvent} f.e. InputEvent.BUTTON1_MASK
      * @return flag of success
      */
     public boolean mouseClick(int x, int y, int buttonMask) {
-        return sendCommandMessage(
+        return sendRequest(
                 new Request(MOUSE_CLICK, x, y, buttonMask)
         ).isSuccess();
     }
 
-    private Response sendCommandMessage(Request request) {
-        return new Client().sendMessage(request, this.host, this.port);
-    }
+    private Response sendRequest(Request request) {
+        Response response;
 
-    public static void main(String[] args) {
-        System.out.println("test");
+        try {
+            NioSocketConnector socketConnector = new NioSocketConnector();
+            ObjectSerializationCodecFactory factory = new ObjectSerializationCodecFactory();
+            factory.setDecoderMaxObjectSize(MAX_TRANSFER_SIZE);
+            factory.setEncoderMaxObjectSize(MAX_TRANSFER_SIZE);
+            socketConnector.getFilterChain().addLast("codec", new ProtocolCodecFilter(factory));
+            socketConnector.setHandler(new com.github.jaqat.remoterobot.client.ClientHandler(request));
+            ConnectFuture connectFuture = socketConnector.connect(new InetSocketAddress(host, port));
+            connectFuture.awaitUninterruptibly();
+            if (connectFuture.isConnected()) {
+                IoSession session = connectFuture.getSession();
+                session.getConfig().setUseReadOperation(true);
+                session.getCloseFuture().awaitUninterruptibly();
+                response = ((ClientHandler) session.getHandler()).getResponse();
+                if (response == null){
+                    response = new Response(request.getOperation())
+                            .withSuccess(false)
+                            .withMessage("Bad response from server");
+                }
+                session.close(true);
+            } else {
+                response = new Response(request.getOperation())
+                        .withSuccess(false)
+                        .withMessage(String.format("Server [%s:%s] is not reachable... ", host, port));
+            }
+            socketConnector.dispose();
+        } catch (Exception e) {
+            response = new Response(request.getOperation())
+                    .withSuccess(false)
+                    .withMessage("Error in interaction with Remote Robot Server: " + e.getMessage() );
+        }
+
+        // Log result of interaction
+        if (response.isSuccess()) {
+            LOGGER.info(response.getMessage());
+        } else {
+            LOGGER.error(response.getMessage());
+        }
+        return response;
     }
 }

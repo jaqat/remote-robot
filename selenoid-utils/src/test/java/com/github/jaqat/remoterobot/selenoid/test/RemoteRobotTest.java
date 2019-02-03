@@ -7,6 +7,11 @@ import com.codeborne.selenide.WebDriverRunner;
 import com.github.jaqat.remoterobot.client.RemoteRobot;
 import com.github.jaqat.remoterobot.selenoid.GgrUtils;
 import com.github.jaqat.remoterobot.selenoid.SelenoidUtils;
+import com.github.jaqat.remoterobot.selenoid.test.enums.Browser;
+import com.github.jaqat.remoterobot.selenoid.test.enums.RemoteBrowserProvider;
+import io.qameta.allure.Attachment;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Step;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,22 +32,12 @@ import java.net.URL;
 import java.util.stream.Stream;
 
 import static com.codeborne.selenide.Selenide.$;
-import static com.github.jaqat.remoterobot.selenoid.test.RemoteRobotTest.RemoteBrowserProvider.*;
+import static com.github.jaqat.remoterobot.selenoid.test.config.TestsConfig.*;
+import static com.github.jaqat.remoterobot.selenoid.test.enums.RemoteBrowserProvider.*;
 import static java.awt.event.KeyEvent.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RemoteRobotTest {
-
-    private final static int SCREEN_WIDTH = 1440;
-    private final static int SCREEN_HEIGHT = 900;
-
-    enum Browser {
-        FIREFOX, CHROME
-    };
-
-    enum RemoteBrowserProvider {
-        GGR, SELENOID
-    }
 
     private URL browserProviderUrl;
 
@@ -57,55 +52,43 @@ public class RemoteRobotTest {
 
     @ParameterizedTest(name = "[{0}:{1}] Check getting pixel color")
     @MethodSource("crossBrowserTests")
+    @Feature("Get pixel color")
     void checkGetPixelColor(RemoteBrowserProvider remoteBrowserProvider, Browser browser) {
         browserProviderUrl = initRemoteWebDriver(browser, remoteBrowserProvider);
-        openColoredPage();
+        openTestPage();
         RemoteRobot remoteRobot = getRemoteRobot(remoteBrowserProvider, browserProviderUrl, ((RemoteWebDriver) WebDriverRunner.getWebDriver()));
 
-        assertEquals(
-                Color.decode("#E9967A"),
-                remoteRobot.getPixelColor(300, 500)
-        );
-
-        assertEquals(
-                Color.decode("#1E90FF"),
-                remoteRobot.getPixelColor(600, 500)
-        );
-
-        assertEquals(
-                Color.decode("#B0C4DE"),
-                remoteRobot.getPixelColor(730, 470)
-        );
+        assertEquals(Color.decode("#E9967A"), remoteRobot.getPixelColor(300, 500));
+        assertEquals(Color.decode("#1E90FF"),remoteRobot.getPixelColor(600, 500));
+        assertEquals(Color.decode("#B0C4DE"),remoteRobot.getPixelColor(730, 470));
     }
 
     @ParameterizedTest(name = "[{0}:{1}] Check click mouse")
     @MethodSource("crossBrowserTests")
+    @Feature("Mouse click")
     void checkClickMouse(RemoteBrowserProvider remoteBrowserProvider, Browser browser) {
         browserProviderUrl = initRemoteWebDriver(browser, remoteBrowserProvider);
-        openColoredPage();
-
+        openTestPage();
         RemoteRobot remoteRobot = getRemoteRobot(remoteBrowserProvider, browserProviderUrl, ((RemoteWebDriver) WebDriverRunner.getWebDriver()));
         remoteRobot.mouseClick(730, 490, InputEvent.BUTTON1_DOWN_MASK);
-
         $("h1").shouldHave(Condition.text("Page after click to button"));
     }
 
     @ParameterizedTest(name = "[{0}:{1}] Check capture screen ")
     @MethodSource("crossBrowserTests")
+    @Feature("Capture screen")
     void checkCaptureScreen(RemoteBrowserProvider remoteBrowserProvider, Browser browser) throws IOException {
         browserProviderUrl = initRemoteWebDriver(browser, remoteBrowserProvider);
-        openColoredPage();
+        openTestPage();
 
         RemoteRobot remoteRobot = getRemoteRobot(remoteBrowserProvider, browserProviderUrl, ((RemoteWebDriver) WebDriverRunner.getWebDriver()));
-        //remoteRobot.captureScreen("/Users/aafrikanov/ColoredPage.png", 100, 200, 1240, 700);
-        //remoteRobot.captureScreen();
 
         File tempFile = File.createTempFile("checkCaptureString", "png");
         remoteRobot.captureScreen(tempFile.getAbsolutePath(), 100, 200, 1240, 700);
         BufferedImage actualImage = ImageIO.read(tempFile);
 
         BufferedImage expectedImage = null;
-        switch (browser){
+        switch (browser) {
             case CHROME:
                 expectedImage = ImageIO.read(
                         new File(getClass().getClassLoader().getResource("tests/chrome/PartitialColoredPage.png").getFile())
@@ -117,12 +100,9 @@ public class RemoteRobotTest {
                         new File(getClass().getClassLoader().getResource("tests/firefox/PartitialColoredPage.png").getFile())
                 );
                 break;
-                default:
-                    throw new IllegalStateException("Unsupported browse");
+            default:
+                throw new IllegalStateException("Unsupported browse");
         }
-//        BufferedImage expectedImage = ImageIO.read(
-//                new File(getClass().getClassLoader().getResource("tests/OriginalPartitialColoredPage.png").getFile())
-//        );
 
         assertEquals(
                 expectedImage.getWidth(),
@@ -147,10 +127,10 @@ public class RemoteRobotTest {
 
     @ParameterizedTest(name = "[{0}:{1}] Check key press")
     @MethodSource("crossBrowserTests")
+    @Feature("Key press")
     void checkKeyPress(RemoteBrowserProvider remoteBrowserProvider, Browser browser) throws IOException {
         browserProviderUrl = initRemoteWebDriver(browser, remoteBrowserProvider);
-        openColoredPage();
-
+        openTestPage();
         RemoteRobot remoteRobot = getRemoteRobot(remoteBrowserProvider, browserProviderUrl, ((RemoteWebDriver) WebDriverRunner.getWebDriver()));
 
         $("input").click();
@@ -162,10 +142,11 @@ public class RemoteRobotTest {
         $("input").shouldHave(Condition.value("test"));
     }
 
-    private void openColoredPage() {
+    @Step("Open test page")
+    private void openTestPage() {
         Selenide.open("http://test-site:80/test_page.html");
         $("div.centered").should(Condition.exist);
-}
+    }
 
     private RemoteRobot getRemoteRobot(RemoteBrowserProvider remoteBrowserProvider, URL remoteBrowserProviderUrl, RemoteWebDriver remoteWebDriver) {
         switch (remoteBrowserProvider) {
@@ -177,6 +158,15 @@ public class RemoteRobotTest {
         return null;
     }
 
+    /*
+     * Can be used for debug to show screenshots in Allure report
+     */
+    @Attachment(value = "{description}", type = "image/png")
+    public static byte[] logImage(String description, byte[] imageBytes) {
+        return imageBytes;
+    }
+
+    @Step("Init remote web driver")
     private URL initRemoteWebDriver(Browser browser, RemoteBrowserProvider remoteBrowserProvider) {
         URL browserProviderUrl = null;
         try {

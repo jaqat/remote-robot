@@ -58,7 +58,9 @@ public class SelenoidUtils {
                 LOGGER.info("### Response:\n" + responseBody);
                 JSONArray exposedPortsRaw = JsonPath.read(responseBody, "$..sessions[?(@.id=='" + sessionId.toString() + "')].containerInfo.exposedPorts");
                 if (exposedPortsRaw.size() != 1) {
-                    throw new IllegalStateException("Can't detect exposed ports of Selenoid's container for session: " + sessionId);
+                    throw new IllegalStateException(
+                            String.format(
+                                    "Can't detect exposed ports of Selenoid's container for session: %s.\nStatus response: \n%s", sessionId, responseBody));
                 }
                 Map<String, String> exposedPorts = (Map<String, String>) exposedPortsRaw.get(0);
                 if (exposedPorts.get(REMOTE_ROBOT_SERVER_PORT) == null) {

@@ -3,4 +3,6 @@
 pom.xml.releaseBackup
 release.properties
 build
+.allure
+allure-results
 **/target

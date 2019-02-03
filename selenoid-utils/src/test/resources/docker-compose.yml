@@ -13,8 +13,8 @@ services:
 
   selenoid:
     container_name: selenoid
-    image: "selenoid:ports"
-    command: ["-timeout", "1m", "-limit", "8", "-container-network", "resources_test-net"]
+    image: "registry.rtty.in/qa/selenoid"
+    command: ["-timeout", "15s", "-limit", "10", "-container-network", "resources_test-net"]
     ports:
       - "4001:4444"
     volumes:

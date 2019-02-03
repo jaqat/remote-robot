@@ -3,7 +3,7 @@
 
     <groupId>com.github.jaqat.remoterobot</groupId>
     <artifactId>parent</artifactId>
-    <version>0.1.5</version>
+    <version>0.1.6</version>
     <packaging>pom</packaging>
     <name>remote-robot</name>
 
@@ -40,13 +40,20 @@
     </modules>
 
     <properties>
-        <!--<project.global.version>0.1.5-SNAPSHOT</project.global.version>-->
         <maven.source.plugin.version>2.1.2</maven.source.plugin.version>
         <slf4j.version>1.7.25</slf4j.version>
         <apache.mina.version>2.0.19</apache.mina.version>
         <commons.io.version>2.6</commons.io.version>
         <selenium.version>3.141.59</selenium.version>
-        <oss.parent.version>9</oss.parent.version>
+
+        <allure-junit5.version>2.8.1</allure-junit5.version>
+        <allure-maven.version>2.9</allure-maven.version>
+        <allure-generator.version>2.7.0</allure-generator.version>
+        <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
+        <aspectj.version>1.8.10</aspectj.version>
+
+        <tests.run.in.parallel>true</tests.run.in.parallel>
+        <tests.run.threads.count>5</tests.run.threads.count>
     </properties>
 
 
@@ -78,6 +85,54 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLine>
+                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
+                    </argLine>
+                    <workingDirectory>${project.build.directory}</workingDirectory>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.execution.parallel.enabled = ${tests.run.in.parallel}
+                            junit.jupiter.execution.parallel.config.strategy = fixed
+                            junit.jupiter.execution.parallel.config.fixed.parallelism = ${tests.run.threads.count}
+                        </configurationParameters>
+                    </properties>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!--Allure configuration-->
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>${allure-maven.version}</version>
+                <configuration>
+                    <allureDownloadUrl>https://github.com/allure-framework/allure2/releases/download/2.7.0/allure-2.7.0.zip</allureDownloadUrl>
+                    <reportVersion>${allure-generator.version}</reportVersion>
+                    <properties>
+                        <allure.report.remove.attachments>.*\.png</allure.report.remove.attachments>
+                    </properties>
                 </configuration>
             </plugin>
 

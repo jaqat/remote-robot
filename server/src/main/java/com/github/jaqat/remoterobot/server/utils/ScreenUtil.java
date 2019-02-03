@@ -1,4 +1,4 @@
-package com.github.jaqat.remoterobot.commons.utils;
+package com.github.jaqat.remoterobot.server.utils;
 
 import com.github.jaqat.remoterobot.commons.protocol.Response;
 
@@ -6,8 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.math.BigInteger;
-import java.util.BitSet;
+import java.util.Base64;
 
 import static com.github.jaqat.remoterobot.commons.protocol.Operation.*;
 
@@ -29,8 +28,9 @@ public class ScreenUtil extends JavaRobotUtil {
                     Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
                     BufferedImage bufferedImage = this.robot.createScreenCapture(rectangle);
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                    Base64.OutputStream outputStream = new Base64.OutputStream(byteArrayOutputStream);
-                    ImageIO.write(bufferedImage, "png", outputStream);
+//                    Base64
+//                    Base64.OutputStream outputStream = new Base64.OutputStream(byteArrayOutputStream);
+                    ImageIO.write(bufferedImage, "png", Base64.getEncoder().wrap(byteArrayOutputStream));
                     return byteArrayOutputStream.toString("UTF-8");
                 },
                 (screen) -> "Captured Remote Screen Successfully",
@@ -45,8 +45,9 @@ public class ScreenUtil extends JavaRobotUtil {
                     Rectangle rectangle = new Rectangle(x, y, width, height);
                     BufferedImage bufferedImage = this.robot.createScreenCapture(rectangle);
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                    Base64.OutputStream outputStream = new Base64.OutputStream(byteArrayOutputStream);
-                    ImageIO.write(bufferedImage, "png", outputStream);
+//                    Base64.OutputStream outputStream = new Base64.OutputStream(byteArrayOutputStream);
+//                    ImageIO.write(bufferedImage, "png", outputStream);
+                    ImageIO.write(bufferedImage, "png", Base64.getEncoder().wrap(byteArrayOutputStream));
                     return byteArrayOutputStream.toString("UTF-8");
                 },
                 (screen) -> "Captured Remote Screen Successfully",

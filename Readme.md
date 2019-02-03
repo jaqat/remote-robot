@@ -1,17 +1,18 @@
-
+# RemoteRobot 
+You can find documentation here: https://github.com/jaqat/remoterobot/wiki.
 
 
 
 ### Build
-Full project build: 
+Full project build:
 ```
-mvn clean install 
+make build
 ```
 
-### Docker-images
-Docker images **"remoterobot/selenoid_XXX:YYY"** based on original Selenoid docker images (XXX) with installed **Java 8** and **remote-robot-server** version YYY.
 
-Building docker-images:
+### Testing
+To run tests: 
 ```
-./docker-images/job.sh
-```  
+make run_tests
+```
+Allure repost will automatically generated and opened.

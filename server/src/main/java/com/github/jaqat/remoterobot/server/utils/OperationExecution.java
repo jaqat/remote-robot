@@ -1,7 +1,7 @@
-package com.github.jaqat.remoterobot.commons.utils;
+package com.github.jaqat.remoterobot.server.utils;
 
 @FunctionalInterface
-public interface OperationActions {
+public interface OperationExecution {
 
     /*
      Execute actions that can return some result object

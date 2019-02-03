@@ -3,7 +3,7 @@
     "default": "64",
     "versions": {
       "64": {
-        "image": "remoterobot/selenoid_firefox_64.0:v0.1",
+        "image": "remoterobot/selenoid_firefox_64.0:0.1.6",
         "port": "4444",
         "path": "/wd/hub",
         "publishAllPorts": true
@@ -14,7 +14,7 @@
     "default": "70",
     "versions": {
       "70": {
-        "image": "remoterobot/selenoid_chrome_71.0:v0.1",
+        "image": "remoterobot/selenoid_chrome_71.0:0.1.6",
         "port": "4444",
         "path": "/",
         "publishAllPorts": true

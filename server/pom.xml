@@ -2,21 +2,21 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.jaqat.remoterobot</groupId>
     <artifactId>server</artifactId>
-    <version>0.1.5</version>
+    <version>0.1.6</version>
 
     <description>Remote Robot Server</description>
 
     <parent>
         <groupId>com.github.jaqat.remoterobot</groupId>
         <artifactId>parent</artifactId>
-        <version>0.1.5</version>
+        <version>0.1.6</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.github.jaqat.remoterobot</groupId>
             <artifactId>commons</artifactId>
-            <version>0.1.5</version>
+            <version>0.1.6</version>
         </dependency>
     </dependencies>
 

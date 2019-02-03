@@ -1,4 +1,4 @@
-package com.github.jaqat.remoterobot.commons.utils;
+package com.github.jaqat.remoterobot.server.utils;
 
 import com.github.jaqat.remoterobot.commons.protocol.Operation;
 import com.github.jaqat.remoterobot.commons.protocol.Response;
@@ -22,7 +22,7 @@ public class JavaRobotUtil {
         }
     }
 
-    protected Response executeOperation(Operation operation, OperationActions actions, Function<Object, String> successMessage, String errorMessage){
+    protected Response executeOperation(Operation operation, OperationExecution actions, Function<Object, String> successMessage, String errorMessage){
         Response response = new Response(operation);
         try{
             Object result = actions.execute();

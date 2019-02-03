@@ -1,4 +1,4 @@
-package com.github.jaqat.remoterobot.commons.utils;
+package com.github.jaqat.remoterobot.server.utils;
 
 import com.github.jaqat.remoterobot.commons.protocol.Response;
 

@@ -1,10 +1,10 @@
 package com.github.jaqat.remoterobot.server;
 
-import com.github.jaqat.remoterobot.commons.utils.KeyUtil;
-import com.github.jaqat.remoterobot.commons.utils.MouseUtil;
+import com.github.jaqat.remoterobot.server.utils.KeyUtil;
+import com.github.jaqat.remoterobot.server.utils.MouseUtil;
 import com.github.jaqat.remoterobot.commons.protocol.Request;
 import com.github.jaqat.remoterobot.commons.protocol.Response;
-import com.github.jaqat.remoterobot.commons.utils.ScreenUtil;
+import com.github.jaqat.remoterobot.server.utils.ScreenUtil;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
