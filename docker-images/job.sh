@@ -2,8 +2,8 @@
 
 echo "### Build and deploy docker-images ###"
 
-#echo "### Login to DockerHub ###"
-#echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER_NAME --password-stdin
+echo "### Login to DockerHub ###"
+echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER_NAME --password-stdin
 
 selenoid_images=(
 	chrome_71.0
