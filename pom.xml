@@ -337,5 +337,6 @@
     <scm>
         <url>https://github.com/jaqat/remoterobot</url>
         <connection>scm:git:https://github.com/jaqat/remoterobot</connection>
+        <developerConnection>scm:git:https://github.com/jaqat/remoterobot/tags/remoterobot</developerConnection>
     </scm>
 </project>
