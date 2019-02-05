@@ -328,7 +328,7 @@
     </profiles>
 
     <scm>
-        <connection>scm:git:http://github.com/jaqat/remoterobot</connection>
+        <connection>scm:git:git@jaqat:github.com/jaqat/remoterobot</connection>
         <developerConnection>scm:git:http://github.com/jaqat/remoterobot</developerConnection>
         <url>https://github.com/jaqat/remoterobot</url>
     </scm>
