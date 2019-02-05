@@ -33,6 +33,8 @@
     </developers>
 
     <properties>
+        <project.scm.id>remote-robot-server</project.scm.id>
+
         <maven.source.plugin.version>2.1.2</maven.source.plugin.version>
         <slf4j.version>1.7.25</slf4j.version>
         <apache.mina.version>2.0.19</apache.mina.version>
