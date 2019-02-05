@@ -3,8 +3,8 @@
 
     <groupId>io.github.jaqat</groupId>
     <artifactId>remoterobot</artifactId>
-    <version>0.1.9-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <version>0.1.9</version>
+    <packaging>jar</packaging>
     <name>remote-robot</name>
 
     <description>Remote Robot</description>
