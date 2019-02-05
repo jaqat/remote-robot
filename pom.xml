@@ -46,9 +46,6 @@
         <allure-generator.version>2.7.0</allure-generator.version>
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <aspectj.version>1.8.10</aspectj.version>
-
-        <tests.run.in.parallel>true</tests.run.in.parallel>
-        <tests.run.threads.count>5</tests.run.threads.count>
     </properties>
 
 
@@ -201,13 +198,6 @@
                         -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
                     </argLine>
                     <workingDirectory>${project.build.directory}</workingDirectory>
-                    <properties>
-                        <configurationParameters>
-                            junit.jupiter.execution.parallel.enabled = ${tests.run.in.parallel}
-                            junit.jupiter.execution.parallel.config.strategy = fixed
-                            junit.jupiter.execution.parallel.config.fixed.parallelism = ${tests.run.threads.count}
-                        </configurationParameters>
-                    </properties>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -300,39 +290,6 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-
-    <profiles>
-        <profile>
-            <id>sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <configuration>
-                            <passphrase>${gpg.passphrase}</passphrase>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <scm>
         <url>https://github.com/jaqat/remoterobot</url>

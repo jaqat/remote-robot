@@ -12,6 +12,7 @@ import io.github.jaqat.remoterobot.selenoid.test.enums.RemoteBrowserProvider;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Step;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -37,6 +38,7 @@ import static io.github.jaqat.remoterobot.selenoid.test.enums.RemoteBrowserProvi
 import static java.awt.event.KeyEvent.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Disabled
 public class RemoteRobotTest {
 
     private URL browserProviderUrl;
