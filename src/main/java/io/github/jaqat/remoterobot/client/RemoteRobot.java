@@ -18,10 +18,6 @@ import java.net.URL;
 import java.util.Base64;
 
 import static io.github.jaqat.remoterobot.common.Operation.*;
-<<<<<<< HEAD:src/main/java/io/github/jaqat/remoterobot/client/RemoteRobot.java
-=======
-
->>>>>>> 2536034... Temp (#1):src/main/java/io/github/jaqat/remoterobot/client/RemoteRobot.java
 
 public class RemoteRobot {
 
