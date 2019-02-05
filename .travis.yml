@@ -4,7 +4,5 @@ branches:
   only:
   - master
 
-#script: ./docker-images/job.sh
-
 after_success:
   - sh ./docker-images/job.sh

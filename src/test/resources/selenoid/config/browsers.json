@@ -1,0 +1,24 @@
+{
+  "firefox": {
+    "default": "64",
+    "versions": {
+      "64": {
+        "image": "remoterobot/selenoid_firefox_64.0:v0.2",
+        "port": "4444",
+        "path": "/wd/hub",
+        "publishAllPorts": true
+      }
+    }
+  },
+  "chrome": {
+    "default": "72",
+    "versions": {
+      "72": {
+        "image": "remoterobot/selenoid_chrome_72.0:v0.2",
+        "port": "4444",
+        "path": "/",
+        "publishAllPorts": true
+      }
+    }
+  }
+}
