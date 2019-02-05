@@ -3,7 +3,7 @@
 
     <groupId>io.github.jaqat</groupId>
     <artifactId>remoterobot</artifactId>
-    <version>0.1.7</version>
+    <version>0.1.7-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>remote-robot</name>
 
@@ -330,7 +330,7 @@
     </profiles>
 
     <scm>
-        <connection>scm:git:git@jaqat:github.com/jaqat/remoterobot</connection>
-        <url>git@jaqat:github.com/jaqat/remoterobot</url>
+        <connection>scm:git:http://github.com/jaqat/remoterobot</connection>
+        <url>http://github.com/jaqat/remoterobot</url>
     </scm>
 </project>
