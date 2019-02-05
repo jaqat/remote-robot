@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-#IMAGE=aafrikanov/remoterobot/selenoid_${ORIGINAL_SELENOID_IMAGE}:${VERSION}
 IMAGE=remoterobot/selenoid_${ORIGINAL_SELENOID_IMAGE}:${VERSION}
 
 echo "### Build '"${IMAGE}"' Docker image..."

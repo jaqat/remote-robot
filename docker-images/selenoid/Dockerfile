@@ -6,7 +6,7 @@ USER root
 RUN apt-get update && \
 		apt-get -y install default-jre
 
-COPY server/target/remote-robot-server.jar /remote-robot-server.jar
+COPY target/remote-robot-server.jar /remote-robot-server.jar
 COPY docker-images/selenoid/start_remote_robot_server.sh /start_remote_robot_server.sh
 
 EXPOSE 5555
