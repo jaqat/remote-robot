@@ -1,11 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.jaqat</groupId>
-    <artifactId>remoterobot</artifactId>
-    <version>0.2.2-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <name>remote-robot</name>
+    <groupId>io.github.jaqat.remoterobot</groupId>
+    <artifactId>remote-robot</artifactId>
+    <version>0.3</version>
+    <packaging>pom</packaging>
 
     <description>Remote Robot</description>
 
@@ -32,10 +32,16 @@
         </developer>
     </developers>
 
-    <properties>
-        <!--<project.scm.id>remote-robot-server</project.scm.id>-->
+    <modules>
+        <module>commons</module>
+        <module>server</module>
+        <module>client</module>
+    </modules>
 
+    <properties>
+        <java.version>1.8</java.version>
         <maven.source.plugin.version>2.1.2</maven.source.plugin.version>
+        <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
         <slf4j.version>1.7.25</slf4j.version>
         <apache.mina.version>2.0.19</apache.mina.version>
         <commons.io.version>2.6</commons.io.version>
@@ -46,6 +52,10 @@
         <allure-generator.version>2.7.0</allure-generator.version>
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <aspectj.version>1.8.10</aspectj.version>
+
+        <tests.run.in.parallel>true</tests.run.in.parallel>
+        <tests.run.threads.count>4</tests.run.threads.count>
+        <deployOnly>false</deployOnly>
     </properties>
 
 
@@ -67,160 +77,34 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-remote-driver</artifactId>
-            <version>${selenium.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-
-        <!-- Allure -->
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit-platform</artifactId>
-            <version>${allure-junit5.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit5</artifactId>
-            <version>${allure-junit5.version}</version>
-        </dependency>
-
-        <!-- JUnit 5 -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-commons</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Selenide -->
-        <dependency>
-            <groupId>com.codeborne</groupId>
-            <artifactId>selenide</artifactId>
-            <version>5.1.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>5.3.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <scm>
+        <url>https://github.com/jaqat/remoterobot</url>
+        <connection>scm:git:git@jaqat:jaqat/remote-robot.git</connection>
+        <developerConnection>scm:git:git@jaqat:jaqat/remote-robot.git</developerConnection>
+    </scm>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>io.github.jaqat.remoterobot.server.Server</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <finalName>remote-robot-server</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                        <phase>package</phase> <!-- bind to the packaging phase -->
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <argLine>
-                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
-                    </argLine>
-                    <workingDirectory>${project.build.directory}</workingDirectory>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjweaver</artifactId>
-                        <version>${aspectj.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <!--Allure configuration-->
-            <plugin>
-                <groupId>io.qameta.allure</groupId>
-                <artifactId>allure-maven</artifactId>
-                <version>${allure-maven.version}</version>
-                <configuration>
-                    <allureDownloadUrl>
-                        https://github.com/allure-framework/allure2/releases/download/2.7.0/allure-2.7.0.zip
-                    </allureDownloadUrl>
-                    <reportVersion>${allure-generator.version}</reportVersion>
-                    <properties>
-                        <allure.report.remove.attachments>.*\.png</allure.report.remove.attachments>
-                    </properties>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
 
@@ -266,34 +150,18 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
+
+            <!--<plugin>-->
+            <!--<groupId>org.sonatype.plugins</groupId>-->
+            <!--<artifactId>nexus-staging-maven-plugin</artifactId>-->
+            <!--<version>1.6.7</version>-->
+            <!--<extensions>true</extensions>-->
+            <!--<configuration>-->
+            <!--<serverId>ossrh</serverId>-->
+            <!--<nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
+            <!--<autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
         </plugins>
     </build>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
-    <scm>
-        <url>https://github.com/jaqat/remoterobot</url>
-        <connection>scm:git:git@jaqat:jaqat/remote-robot.git</connection>
-        <developerConnection>scm:git:git@jaqat:jaqat/remote-robot.git</developerConnection>
-    </scm>
 </project>
