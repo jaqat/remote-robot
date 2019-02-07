@@ -151,9 +151,9 @@ public class RemoteRobotTest {
     private RemoteRobot getRemoteRobot(RemoteBrowserProvider remoteBrowserProvider, URL remoteBrowserProviderUrl, RemoteWebDriver remoteWebDriver) {
         switch (remoteBrowserProvider) {
             case GGR:
-                return GgrUtils.getRemoteRobot(remoteBrowserProviderUrl, remoteWebDriver);
+                return GgrUtils.getRemoteRobot(remoteWebDriver);
             case SELENOID:
-                return SelenoidUtils.getRemoteRobot(remoteBrowserProviderUrl, remoteWebDriver);
+                return SelenoidUtils.getRemoteRobot(remoteWebDriver);
         }
         return null;
     }

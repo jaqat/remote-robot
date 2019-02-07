@@ -2,11 +2,11 @@ package io.github.jaqat.remoterobot.utils;
 
 import com.jayway.jsonpath.JsonPath;
 import io.github.jaqat.remoterobot.client.RemoteRobot;
+import javafx.util.Pair;
 import net.minidev.json.JSONArray;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,61 +21,95 @@ import static java.util.stream.Collectors.joining;
 
 public class SelenoidUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SelenoidUtils.class);
-
-    public static RemoteRobot getRemoteRobot(URL selenoidUrl, RemoteWebDriver remoteWebDriver) {
-        URL remoteRobotUrl;
+    /**
+     * Get RemoteRobot instance for remote browser created by Selenoid
+     *
+     * @param remoteWebDriver instance of RemoteWebDriver
+     * @return {@link RemoteRobot} instance
+     */
+    public static RemoteRobot getRemoteRobot(RemoteWebDriver remoteWebDriver) {
         try {
-            remoteRobotUrl = new URL(
-                    String.format(
-                            "%s://%s:%s",
-                            selenoidUrl.getProtocol(),
-                            selenoidUrl.getHost(),
-                            getRemoteRobotExposedPort(selenoidUrl, remoteWebDriver.getSessionId())
+            URL remoteServerAddress = ((HttpCommandExecutor) remoteWebDriver.getCommandExecutor()).getAddressOfRemoteServer();
+            return new RemoteRobot(
+                    new URL(
+                            remoteServerAddress.getProtocol(),
+                            remoteServerAddress.getHost(),
+                            getRemoteRobotPublishedPort(
+                                    getSessionInfo(
+                                            getResource(new URL(remoteServerAddress.getProtocol(), remoteServerAddress.getHost(), remoteServerAddress.getPort(), "/status")),
+                                            remoteWebDriver.getSessionId()
+                                    )
+                            ),
+                            ""
                     )
             );
         } catch (MalformedURLException e) {
             throw new IllegalStateException("Invalid url of Remote Robot Server: " + e.getMessage());
         }
-        return new RemoteRobot(remoteRobotUrl);
     }
 
-    static String getRemoteRobotExposedPort(URL selenoidUrl, SessionId sessionId) {
+    /**
+     * Get response body of requested URL
+     *
+     * @param url
+     * @param requestProperties HttpURLConnection's properties (not required)
+     * @return response body's string
+     */
+    static String getResource(URL url, Pair<String, String>... requestProperties) {
         HttpURLConnection connection = null;
         try {
-            LOGGER.info("##### Get selenoid's status");
-            URL selenoidStatusUrl = new URL(selenoidUrl, "/status");
-            connection = ((HttpURLConnection) selenoidStatusUrl.openConnection());
+            connection = ((HttpURLConnection) url.openConnection());
             connection.setRequestMethod("GET");
-            LOGGER.info("### Request : " + connection.getRequestMethod() + " " + connection.getURL());
-            connection = (HttpURLConnection) selenoidStatusUrl.openConnection();
+            for (Pair<String, String> property : requestProperties){
+                connection.setRequestProperty(property.getKey(), property.getValue());
+            }
             int status = connection.getResponseCode();
             if (status == -1 || status > 299) {
-                throw new IllegalStateException("Can't get Selenoid's status. Response code: " + status);
+                throw new IllegalStateException(String.format("Can't get resource: %s. Response code: %d", url, status));
             }
             try (BufferedReader buffer = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 String responseBody = buffer.lines().collect(joining("\n"));
-                LOGGER.info("### Response:\n" + responseBody);
-                JSONArray exposedPortsRaw = JsonPath.read(responseBody, "$..sessions[?(@.id=='" + sessionId.toString() + "')].containerInfo.exposedPorts");
-                if (exposedPortsRaw.size() != 1) {
-                    throw new IllegalStateException(
-                            String.format(
-                                    "Can't detect exposed ports of Selenoid's container for session: %s.\nStatus response: \n%s", sessionId, responseBody));
-                }
-                Map<String, String> exposedPorts = (Map<String, String>) exposedPortsRaw.get(0);
-                if (exposedPorts.get(REMOTE_ROBOT_SERVER_PORT) == null) {
-                    throw new IllegalStateException("RemoteRobotServer's port" + REMOTE_ROBOT_SERVER_PORT + " is not published");
-                }
-                return exposedPorts.get(REMOTE_ROBOT_SERVER_PORT);
+                return responseBody;
             } catch (IOException ioe) {
-                throw new RuntimeException("Error while reading Selenoid's status");
+                throw new RuntimeException("Error while reading http response", ioe);
             }
         } catch (IOException ioe) {
-            throw new IllegalStateException("Can't get Selenoid's status: " + ioe.getMessage());
+            throw new IllegalStateException("Error while performing http request: " + url);
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
+    }
+
+    /**
+     * Parse json object with session info from Selenoid's status response
+     *
+     * @param selenoidStatus response body of Selenoid's /status
+     * @param sessionId remoteWebDriver's session id
+     * @return json with session info
+     */
+    static Object getSessionInfo(String selenoidStatus, SessionId sessionId) {
+        JSONArray foundedSessions = JsonPath.read(selenoidStatus, "$..sessions[?(@.id=='" + sessionId.toString() + "')]");
+        if (foundedSessions.size() != 1) {
+            throw new IllegalStateException(
+                    String.format(
+                            "Selenoid doesn't contains session: %s.\nStatus:\n%s" + sessionId, selenoidStatus));
+        }
+        return foundedSessions.get(0);
+    }
+
+    /**
+     * Parse published RemoteRobot server's port from session info json
+     *
+     * @param selenoidSessionInfo session info json
+     * @return published port of internal 5555 port of Selenoid docker container with browser
+     */
+    static int getRemoteRobotPublishedPort(Object selenoidSessionInfo) {
+        Map<String, String> exposedPorts = JsonPath.read(selenoidSessionInfo, "$.containerInfo.exposedPorts");
+        if (exposedPorts.get(REMOTE_ROBOT_SERVER_PORT) == null) {
+            throw new IllegalStateException("RemoteRobotServer's port" + REMOTE_ROBOT_SERVER_PORT + " is not published");
+        }
+        return Integer.parseInt(exposedPorts.get(REMOTE_ROBOT_SERVER_PORT));
     }
 }

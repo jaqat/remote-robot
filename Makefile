@@ -2,6 +2,9 @@
 set_version:
 	mvn versions:set -DnewVersion=${VERSION}
 
+clean:
+	mvn clean
+
 build_commons:
 	mvn clean install -pl :commons
 
@@ -19,7 +22,7 @@ run_test_env:
 	docker-compose -f client/src/test/resources/docker-compose.yml up -d
 
 ### Full project build
-full_build: build_commons build_server build_docker_images run_test_env build_client
+full_build: clean build_commons build_server build_docker_images run_test_env build_client
 
 ### Project deploy
 deploy: full_build

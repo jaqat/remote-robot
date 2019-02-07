@@ -2,107 +2,80 @@ package io.github.jaqat.remoterobot.utils;
 
 import com.jayway.jsonpath.JsonPath;
 import io.github.jaqat.remoterobot.client.RemoteRobot;
+import javafx.util.Pair;
 import org.apache.mina.util.Base64;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static io.github.jaqat.remoterobot.utils.SelenoidUtils.getRemoteRobotExposedPort;
-import static java.util.stream.Collectors.joining;
+import static io.github.jaqat.remoterobot.utils.SelenoidUtils.getRemoteRobotPublishedPort;
+import static io.github.jaqat.remoterobot.utils.SelenoidUtils.getResource;
+import static io.github.jaqat.remoterobot.utils.SelenoidUtils.getSessionInfo;
 
 public class GgrUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GgrUtils.class);
-
-    public static RemoteRobot getRemoteRobot(URL ggrUrl, RemoteWebDriver remoteWebDriver) {
-        URL remoteRobotUrl;
+    public static RemoteRobot getRemoteRobot(RemoteWebDriver remoteWebDriver) {
         try {
+            URL remoteServer = ((HttpCommandExecutor) remoteWebDriver.getCommandExecutor()).getAddressOfRemoteServer();
 
-            URL selenoidUrl = getSelenoidUrlOfCurrentSession(ggrUrl, remoteWebDriver.getSessionId());
-            SessionId selenoidSessionId = new SessionId(remoteWebDriver.getSessionId().toString().substring(32));
+            URL selenoidUrl = getSelenoidUrl(
+                    new URL(
+                            remoteServer.getProtocol(),
+                            remoteServer.getHost(),
+                            remoteServer.getPort(),
+                            "/host/" + remoteWebDriver.getSessionId()
+                    ),
+                    remoteServer.getUserInfo()
+            );
 
-            remoteRobotUrl = new URL(
-                    String.format(
-                            "%s://%s:%s",
+            return new RemoteRobot(
+                    new URL(
                             selenoidUrl.getProtocol(),
                             selenoidUrl.getHost(),
-                            getRemoteRobotExposedPort(selenoidUrl, selenoidSessionId)
+                            getRemoteRobotPublishedPort(
+                                    getSessionInfo(
+                                            getResource(new URL(selenoidUrl.getProtocol(), selenoidUrl.getHost(), selenoidUrl.getPort(), "/status")),
+                                            getSelenoidSessionId(remoteWebDriver.getSessionId())
+                                    )
+                            ),
+                            ""
                     )
             );
         } catch (MalformedURLException e) {
-            throw new IllegalStateException("Invalid url of Remote Robot Server: " + e.getMessage());
+            throw new IllegalStateException(e);
         }
-        return new RemoteRobot(remoteRobotUrl);
     }
 
-    static URL getSelenoidUrlOfCurrentSession(URL ggrUrl, SessionId sessionId) {
-        HttpURLConnection connection = null;
+    /**
+     * Get Selenoid's SessionId from GGR's SessionId
+     *
+     * @param ggrSessionId
+     * @return
+     */
+    static private SessionId getSelenoidSessionId(SessionId ggrSessionId) {
+        return new SessionId(ggrSessionId.toString().substring(32));
+    }
+
+    static private URL getSelenoidUrl(URL ggrSessionHostInfoUrl, String auth) {
+        if (auth == null) {
+            throw new IllegalStateException("There is no user info for authorization");
+        }
         try {
-            LOGGER.info("##### Get selenoid's status");
-            URL ggrSessionHostInfoUrl = new URL(ggrUrl, "/host/" + sessionId);
-            connection = ((HttpURLConnection) ggrSessionHostInfoUrl.openConnection());
-            connection.setRequestMethod("GET");
-            try {
-                String authStr = ggrUrl.getAuthority().substring(
-                        0,
-                        ggrUrl.getAuthority().indexOf("@")
-                );
-                connection.setRequestProperty("Authorization", "Basic " + new String(Base64.encodeBase64(authStr.getBytes())));
-            } catch (StringIndexOutOfBoundsException outBoundsException){
-                throw new IllegalStateException("GGR url must contains authorization data", outBoundsException);
+            String sessionHostInfo = getResource(
+                    ggrSessionHostInfoUrl,
+                    new Pair<>("Authorization", "Basic " + new String(Base64.encodeBase64(auth.getBytes())))
+            );
+            if (sessionHostInfo == null || sessionHostInfo.isEmpty()) {
+                throw new IllegalStateException("There is no host info for session: " + ggrSessionHostInfoUrl.getFile());
             }
-            LOGGER.info("### Request: (" + connection.getRequestMethod() + ") " + connection.getURL());
-            int status = connection.getResponseCode();
-            if (status == -1 || status > 299) {
-                throw new IllegalStateException("Can't get GGR's session host info. Response code: " + status);
-            }
-            try (BufferedReader buffer = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String responseBody = buffer.lines().collect(joining("\n"));
-                LOGGER.info("### Response:\n" + responseBody);
-                try {
-                    String selenoidHost = JsonPath.read(responseBody, "$.Name");
-                    return new URL(
-                            String.format(
-                                    "http://%s:%d",
-                                    "docker.for.mac.localhost".equals(selenoidHost) ? "localhost" : selenoidHost,
-                                    JsonPath.read(responseBody, "$.Port")
-                            )
-                    );
-                } catch (MalformedURLException e){
-                    throw new IllegalStateException("Wrong generated Selenoid url", e);
-                }
-            } catch (IOException ioe) {
-                throw new RuntimeException("Error while reading Selenoid's status", ioe);
-            }
-        } catch (IOException ioe) {
-            throw new IllegalStateException("Can't get Selenoid's status", ioe);
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
+            String selenoidHost = JsonPath.read(sessionHostInfo, "$.Name");
+            return new URL("http", "docker.for.mac.localhost".equals(selenoidHost) ? "localhost" : selenoidHost, JsonPath.read(sessionHostInfo, "$.Port"), "");
+
+        } catch (MalformedURLException mfe) {
+            throw new IllegalStateException("Illegal generated selenoid url", mfe);
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-
-        //HttpURLConnection connection =
-
-
-        URL ggrSessionHostInfoUrl = new URL("http://test:test@localhost:4000/host/c2b93f672bde998188f0bea0f2cb219087f8bb791e5288a46c07cd216ed77edf");
-        //URL ggrSessionHostInfoUrl = new URL("http://test:test@localhost:4000/host");
-        //URL ggrSessionHostInfoUrl = new URL("http://localhost:4001/status");
-        HttpURLConnection connection = ((HttpURLConnection) ggrSessionHostInfoUrl.openConnection());
-        connection.setRequestProperty("Authorization", "Basic dGVzdDp0ZXN0");
-        connection.setRequestMethod("GET");
-        System.out.println("status: " + connection.getResponseCode());
-
     }
 }
