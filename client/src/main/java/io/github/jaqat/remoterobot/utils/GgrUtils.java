@@ -17,6 +17,12 @@ import static io.github.jaqat.remoterobot.utils.SelenoidUtils.getSessionInfo;
 
 public class GgrUtils {
 
+    /**
+     * Get RemoteRobot instance for remote browser created by GGR
+     *
+     * @param remoteWebDriver instance of RemoteWebDriver
+     * @return {@link RemoteRobot} instance
+     */
     public static RemoteRobot getRemoteRobot(RemoteWebDriver remoteWebDriver) {
         try {
             URL remoteServer = ((HttpCommandExecutor) remoteWebDriver.getCommandExecutor()).getAddressOfRemoteServer();
