@@ -27,7 +27,7 @@
         <junit.version>5.3.1</junit.version>
         <selenide.version>5.1.0</selenide.version>
         <tests.run.in.parallel>true</tests.run.in.parallel>
-        <tests.run.threads.count>4</tests.run.threads.count>
+        <tests.run.threads.count>2</tests.run.threads.count>
     </properties>
 
     <dependencies>
