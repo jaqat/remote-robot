@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 selenoid_images=(
-	chrome_71.0
+	#chrome_71.0
 	chrome_72.0
 
 	firefox_64.0
 )
-
 
 function generate_image_name(){
 	image_name='remoterobot/selenoid_'$1':'$2

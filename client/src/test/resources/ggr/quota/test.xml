@@ -3,7 +3,8 @@
     <browser name="firefox" defaultVersion="64">
         <version number="64">
             <region name="1">
-                <host name="docker.for.mac.localhost" port="4001" count="1"/>
+                <!--<host name="docker.for.mac.localhost" port="4001" count="1"/>-->
+                <host name="localhost" port="4001" count="1"/>
             </region>
         </version>
     </browser>
