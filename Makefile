@@ -28,7 +28,8 @@ run_test_env:
 full_build: clean build_commons build_server build_temp_docker_images run_test_env build_client
 
 ### Push Selenoid images
-# VERSION=X required !
+# Required environment parameter: VERSION
+# Use version started with 'v' symbol (f.e. v0.3)
 deploy_docker_images:
 	./docker-images/build_and_deploy_selenoid_images.sh
 

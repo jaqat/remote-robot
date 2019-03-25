@@ -9,7 +9,7 @@ selenoid_images=(
 
 
 function generate_image_name(){
-	image_name='remoterobot/selenoid_'$1':v'$2
+	image_name='remoterobot/selenoid_'$1':'$2
 }
 
 #############################################
