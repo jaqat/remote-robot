@@ -36,6 +36,7 @@ deploy_docker_images:
 deploy_java_libs:
 	mvn deploy -pl :client -Dmaven.test.skip=true
 	mvn deploy -pl :commons
+	mvn deploy -pl . -Dmaven.test.skip=true
 
 
 
