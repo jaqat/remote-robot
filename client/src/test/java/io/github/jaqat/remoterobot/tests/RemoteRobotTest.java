@@ -44,8 +44,8 @@ public class RemoteRobotTest {
     public static Stream<Arguments> crossBrowserTests() {
         return Stream.of(Browser.values()).flatMap(
                 browser -> Stream.of(
-                        Arguments.of(GGR, browser),
-                        Arguments.of(SELENOID, browser)
+                        Arguments.of(GGR, browser)
+                        //Arguments.of(SELENOID, browser)
                 )
         );
     }

@@ -13,7 +13,7 @@ services:
 
   selenoid:
     container_name: selenoid
-    image: "registry.rtty.in/qa/selenoid"
+    image: aerokube/selenoid:latest-release
     command: ["-timeout", "15s", "-limit", "10", "-container-network", "resources_test-net"]
     ports:
       - "4001:4444"

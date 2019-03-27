@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.jaqat.remoterobot</groupId>
     <artifactId>commons</artifactId>
-    <version>0.3</version>
+    <version>0.3.1</version>
     <packaging>jar</packaging>
 
     <description>Remote Robot Commons</description>
@@ -10,7 +10,7 @@
     <parent>
         <groupId>io.github.jaqat.remoterobot</groupId>
         <artifactId>remote-robot</artifactId>
-        <version>0.3</version>
+        <version>0.3.1</version>
     </parent>
 
 </project>

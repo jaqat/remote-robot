@@ -28,8 +28,6 @@ public class ScreenUtil extends JavaRobotUtil {
                     Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
                     BufferedImage bufferedImage = this.robot.createScreenCapture(rectangle);
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                    Base64
-//                    Base64.OutputStream outputStream = new Base64.OutputStream(byteArrayOutputStream);
                     ImageIO.write(bufferedImage, "png", Base64.getEncoder().wrap(byteArrayOutputStream));
                     return byteArrayOutputStream.toString("UTF-8");
                 },
@@ -45,8 +43,6 @@ public class ScreenUtil extends JavaRobotUtil {
                     Rectangle rectangle = new Rectangle(x, y, width, height);
                     BufferedImage bufferedImage = this.robot.createScreenCapture(rectangle);
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                    Base64.OutputStream outputStream = new Base64.OutputStream(byteArrayOutputStream);
-//                    ImageIO.write(bufferedImage, "png", outputStream);
                     ImageIO.write(bufferedImage, "png", Base64.getEncoder().wrap(byteArrayOutputStream));
                     return byteArrayOutputStream.toString("UTF-8");
                 },

@@ -4,6 +4,7 @@
         <version number="64">
             <region name="1">
                 <host name="docker.for.mac.localhost" port="4001" count="1"/>
+                <!--<host name="localhost" port="4001" count="2"/>-->
             </region>
         </version>
     </browser>
@@ -12,6 +13,7 @@
        <version number="72">
            <region name="1">
                <host count="5" name="docker.for.mac.localhost" port="4001"/>
+               <!--<host name="localhost" port="4001" count="2"/>-->
            </region>
        </version>
    </browser>
