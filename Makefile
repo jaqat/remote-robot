@@ -45,9 +45,3 @@ deploy_docker_images:
 ### Full deploy
 full_deploy:
 	mvn deploy -pl .,commons,client -Dmaven.test.skip=true
-
-
-
-
-
-
