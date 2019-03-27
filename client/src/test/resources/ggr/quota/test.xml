@@ -3,8 +3,8 @@
     <browser name="firefox" defaultVersion="64">
         <version number="64">
             <region name="1">
-                <!--<host name="docker.for.mac.localhost" port="4001" count="1"/>-->
-                <host name="localhost" port="4001" count="2"/>
+                <host name="docker.for.mac.localhost" port="4001" count="1"/>
+                <!--<host name="localhost" port="4001" count="2"/>-->
             </region>
         </version>
     </browser>
@@ -12,8 +12,8 @@
    <browser name="chrome" defaultVersion="72">
        <version number="72">
            <region name="1">
-               <!--<host count="5" name="docker.for.mac.localhost" port="4001"/>-->
-               <host name="localhost" port="4001" count="2"/>
+               <host count="5" name="docker.for.mac.localhost" port="4001"/>
+               <!--<host name="localhost" port="4001" count="2"/>-->
            </region>
        </version>
    </browser>
