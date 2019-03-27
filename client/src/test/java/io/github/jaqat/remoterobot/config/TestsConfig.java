@@ -1,4 +1,4 @@
-package io.github.jaqat.remoterobot.tests.config;
+package io.github.jaqat.remoterobot.config;
 
 public class TestsConfig {
 

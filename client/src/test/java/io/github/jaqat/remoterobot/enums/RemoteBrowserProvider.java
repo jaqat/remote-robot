@@ -1,4 +1,4 @@
-package io.github.jaqat.remoterobot.tests.enums;
+package io.github.jaqat.remoterobot.enums;
 
 public enum RemoteBrowserProvider {
     GGR, SELENOID
